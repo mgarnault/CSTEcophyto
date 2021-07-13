@@ -33,7 +33,7 @@ library("parallel")
 
 
 # Working directory
-path="C:/Users/mgarnault/Documents/CSTEcophyto/data/mailles_safran/"
+path="C:/Users/mgarnault/Documents/CSTEcophyto"
 
 
 # Grid estimation method
@@ -48,7 +48,7 @@ if(handmade){name=paste0(name,"_handmade")}else{name=paste0(name,"_points2grid")
 
 # DATA HANDELING #
 # Importation
-df=read.table(paste0(path,"raw/mailles_safran_drias-20200206.csv"),
+df=read.table(paste0(path,"/data/mailles_safran/raw/mailles_safran_drias-20200206.csv"),
               sep=",",header=TRUE,stringsAsFactors=FALSE,encoding="UTF-8",quote="\"") # ZIP content downloaded from https://siclima.intranet.inrae.fr/siclima/help/extraction/creation/sel_mailles.html#choisir-les-mailles-avec-leurs-attributs
 df2=df
 
@@ -74,7 +74,7 @@ if(handmade){
 }
 
 
-# Plot of true-centroids from df and estimated-centroids from grid
+# Plot to compare location of true-centroids (df) and estimated-centroids (grid)
 # zoom=list(All=list(longitude=c(0,1200000),latitude=c(1600000,2700000)),
 #           Max1=list(longitude=c(1100000,1200000),latitude=c(1650000,1750000)),
 #           Max2=list(longitude=c(500000,600000),latitude=c(2100000,2200000)),
@@ -116,20 +116,27 @@ grid=st_transform(grid,crs="+init=epsg:4326")
 
 
 # Sortening of grid cells that actually contain centroids
+unlink(paste0(path,"/parallel/consoleOutputs/*"),recursive=TRUE)
+
 cl=makeCluster(spec=(detectCores()-1))
 # cl=makeCluster(spec=(detectCores()))
+
+clusterExport(cl,c("path","grid","df"))
+
 clusterEvalQ(cl,{
   library("sf")
-  sink(paste0("C:/Users/mgarnault/Documents/CSTEcophyto/data/mailles_safran/parallel_PID",Sys.getpid(),".txt"))
+  sink(paste0(path,"/parallel/consoleOutputs/jobPID",Sys.getpid(),".txt"))
 })
-clusterExport(cl,c("grid","df"))
+
 df$gridLoc=parApply(cl,df,1,function(row){
   pnt=st_sfc(st_point(c(as.numeric(row["longitude"]),as.numeric(row["latitude"]))),crs=4326)
   id=row["ID"]
   print(id)
   return(as.numeric(st_intersects(pnt,grid)))
 })
+
 stopCluster(cl)
+
 grid=grid[df$gridLoc,]
 
 
@@ -138,7 +145,7 @@ grid=cbind(grid,df)
 grid=grid[,-which(colnames(grid)%in%c("layer","gridLoc"))]
 
 
-# Computation of the distance between the estimated grid centroids and the actual centroids
+# Computation of the distance between true-centroids (df) and estimated-centroids (grid) 
 # estimatedCentroids=st_centroid(grid)
 # 
 # df2=df
@@ -178,10 +185,10 @@ ggplot()+
 
 
 # SAVE #
-if(!file.exists(paste0(path,"output/SAFRANgrid",name))){
-  dir.create(paste0(path,"output/SAFRANgrid",name))
+if(!file.exists(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name))){
+  dir.create(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name))
 }else{
-  unlink(paste0(path,"output/SAFRANgrid",name),recursive=TRUE)
-  dir.create(paste0(path,"output/SAFRANgrid",name))
+  unlink(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name),recursive=TRUE)
+  dir.create(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name))
 }
-st_write(grid,paste0(path,"output/SAFRANgrid",name,"/SAFRANgrid",name,".shp"),layer_options="ENCODING=UTF-8")
+st_write(grid,paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/SAFRANgrid",name,".shp"),layer_options="ENCODING=UTF-8")

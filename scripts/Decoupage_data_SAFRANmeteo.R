@@ -17,8 +17,14 @@ gc()
 # Clear console
 cat("\014")
 
+
+# Packages
+# install.packages("parallel")
+library("parallel")
+
+
 # Working directory
-path="C:/Users/mgarnault/Documents/CSTEcophyto/data/meteo_safran/"
+path="C:/Users/mgarnault/Documents/CSTEcophyto"
 
 
 
@@ -26,48 +32,82 @@ path="C:/Users/mgarnault/Documents/CSTEcophyto/data/meteo_safran/"
 
 
 # DATA LOAD, SPLIT AND SAVE #
-weather=read.table(paste0(path,"raw/guillaumeHarel/siclima_extraction_401_20210413.csv"),
+# Loading data
+weather=read.table(paste0(path,"/data/meteo_safran/raw/guillaumeHarel/siclima_extraction_401_20210413.csv"),
                    sep=";",header=TRUE,stringsAsFactors=FALSE)
 table(weather$Month,weather$Year)
 
+# Saving years and months values
 years=unique(weather$Year)
 months=unique(weather$Month)
 
-for(year in years){
-  if(!file.exists(paste0(path,"output/mailles/",year))){
-    dir.create(paste0(path,"output/mailles/",year))
+# Emptying parallelisaion folders
+unlink(paste0(path,"/parallel/consoleOutputs/*"),recursive=TRUE)
+unlink(paste0(path,"/parallel/tempData/*"),recursive=TRUE)
+
+# Splitting the inter-annual data into mono-annual datas
+sapply(years,function(year){
+  saveRDS(weather[which(weather$Year==year),],
+              paste0(path,"/parallel/tempData/",year,".rds"))
+})
+rm(list="weather") # remove the big weather dataset from the RAM
+gc()
+
+# Parallel computation
+cl=makeCluster(spec=(detectCores()-1)) # custers creation
+# cl=makeCluster(spec=(detectCores()))
+
+clusterExport(cl,c("path","months")) # exportation of R objects in clusters
+
+clusterEvalQ(cl,{
+  sink(paste0(path,"/parallel/consoleOutputs/jobPID",Sys.getpid(),".txt")) # saving console outputs in .txt files
+})
+
+parSapply(cl,years,function(year){
+  cat(paste0("==========\n",year,"\n")) # display the processed year
+
+  if(!file.exists(paste0(path,"/data/meteo_safran/output/",year))){ # create a year folder
+    dir.create(paste0(path,"/data/meteo_safran/output/",year))
   }else{
-    unlink(paste0(path,"output/mailles/",year),recursive=TRUE)
-    dir.create(paste0(path,"output/mailles/",year))
+    unlink(paste0(path,"/data/meteo_safran/output/",year),recursive=TRUE)
+    dir.create(paste0(path,"/data/meteo_safran/output/",year))
   }
   
-  df=weather[which(weather$Year==year),]
-  write.table(df,
-              paste0(path,"output/mailles/",year,"/Total_",year,".csv"),
+  df=readRDS(paste0(path,"/parallel/tempData/",year,".rds"))
+  write.table(df, # save the raw dataset containing 1 year
+              paste0(path,"/data/meteo_safran/output/",year,"/Total_",year,".csv"),
               sep=";",row.names=FALSE)
-  df=df[,-which(colnames(df)%in%c("Month","DOM","DOY"))]
-  write.table(aggregate(.~Site,df,"mean"),
-              paste0(path,"output/mailles/",year,"/Moyenne_",year,".csv"),
+  
+  df2=df[,-which(colnames(df)%in%c("Month","DOM","DOY"))]
+  write.table(aggregate(.~Site,df2,"mean"), # save the averaged dataset containing 1 year
+              paste0(path,"/data/meteo_safran/output/",year,"/Moyenne_",year,".csv"),
               sep=";",row.names=FALSE)
   
   for(month in months){
-    dir.create(paste0(path,"output/mailles/",year,"/",month,"-",year))
+    cat(paste0("----------\n",month,"-",year,"\n")) # display the processed month
+
+    dir.create(paste0(path,"/data/meteo_safran/output/",year,"/",month,"-",year))
     
-    df=weather[which(weather$Year==year & weather$Month==month),]
-    write.table(df,
-                paste0(path,"output/mailles/",year,"/",month,"-",year,"/Total_",month,"-",year,".csv"),
-                sep=";",row.names=FALSE)
-    df=df[,-which(colnames(df)%in%c("DOM","DOY"))]
-    write.table(aggregate(.~Site,df,"mean"),
-                paste0(path,"output/mailles/",year,"/",month,"-",year,"/Moyenne_",month,"-",year,".csv"),
+    df2=df[which(df$Year==year & df$Month==month),]
+    write.table(df2, # save the raw dataset containing 1 month
+                paste0(path,"/data/meteo_safran/output/",year,"/",month,"-",year,"/Total_",month,"-",year,".csv"),
                 sep=";",row.names=FALSE)
     
-    days=unique(weather$DOM[which(weather$Year==year & weather$Month==month)])
+    df2=df2[,-which(colnames(df)%in%c("DOM","DOY"))]
+    write.table(aggregate(.~Site,df2,"mean"), # save the averaged dataset containing 1 month
+                paste0(path,"/data/meteo_safran/output/",year,"/",month,"-",year,"/Moyenne_",month,"-",year,".csv"),
+                sep=";",row.names=FALSE)
+    
+    days=unique(df$DOM[which(df$Year==year & df$Month==month)])
     for(day in days){
-      df=weather[which(weather$Year==year & weather$Month==month & weather$DOM==day),]
-      write.table(df,
-                  paste0(path,"output/mailles/",year,"/",month,"-",year,"/",day,"-",month,"-",year,".csv"),
+      cat(paste0("-\n",day,"-",month,"-",year,"\n")) # display the processed day
+
+      df2=df[which(df$Year==year & df$Month==month & df$DOM==day),]
+      write.table(df2, # save the raw dataset containing 1 day
+                  paste0(path,"/data/meteo_safran/output/",year,"/",month,"-",year,"/",day,"-",month,"-",year,".csv"),
                   sep=";",row.names=FALSE)
-    }
+      }
   }
-}
+})
+
+stopCluster(cl)

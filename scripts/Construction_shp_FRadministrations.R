@@ -41,7 +41,7 @@ library("parallel")
 
 
 # Working directory
-path="C:/Users/mgarnault/Documents/CSTEcophyto/data/shapes_administration/"
+path="C:/Users/mgarnault/Documents/CSTEcophyto"
 
 
 # Global parameters
@@ -54,20 +54,24 @@ metropolisLimits=st_sfc(st_polygon(list(cbind(c(-7,10,10,-7,-7),
 metropolisLimits=st_sf(loc="Métropole",metropolisLimits,crs=4326) # crs=4326 corresponds to the international WGS84 coordinates system
 
 name="" # store the chosen characteristics for future data saving  
-if(metropolis){name=paste0(name,"_metropolis")}else{name=paste0(name,"_metropolis&DROM")}
-if(lite){name=paste0(name,"_lite")}else{name=paste0(name,"_complete")}
+if(metropolis){name=paste0(name,"_metropole")}else{name=paste0(name,"_metropole&DROM")}
+if(lite){name=paste0(name,"_lite")}else{name=paste0(name,"_complet")}
 
-# shape="communes" # Shapefile: https://www.data.gouv.fr/fr/datasets/decoupage-administratif-communal-francais-issu-d-openstreetmap/
+shape="communes" # Shapefile: https://www.data.gouv.fr/fr/datasets/decoupage-administratif-communal-francais-issu-d-openstreetmap/
 # shape="departements" # Shapefile: https://www.data.gouv.fr/fr/datasets/contours-des-departements-francais-issus-d-openstreetmap/
-shape="regions" # Shapefile: https://www.data.gouv.fr/fr/datasets/contours-des-regions-francaises-sur-openstreetmap/
-
+# shape="regions" # Shapefile: https://www.data.gouv.fr/fr/datasets/contours-des-regions-francaises-sur-openstreetmap/
+# shape="france" # based on st_union(regions)
 
 
 
 
 
 # COMMUNAL POLYGONS #
-polygons=st_read(paste0(path,"raw/",shape),options="ENCODING=UTF-8")
+if(shape=="france"){
+  polygons=st_read(paste0(path,"/data/shapes_administration/raw/regions"),options="ENCODING=UTF-8")
+}else{
+  polygons=st_read(paste0(path,"/data/shapes_administration/raw/",shape),options="ENCODING=UTF-8")
+}
 object.size(polygons)
 
 
@@ -76,30 +80,33 @@ if(metropolis){polygons=filter(polygons,st_intersects(polygons,metropolisLimits,
 object.size(polygons)
 names=polygons$nom
 wikipedia=polygons$wikipedia
-# comFR_help=polygons[1:50,]
-# st_write(comFR_help,paste0(path,"output/comFR_help.shp"),layer_options="ENCODING=UTF-8")
 
 
 # Simplifying polygons if lite==TRUE
 if(lite){polygons=ms_simplify(polygons,keep=retained,keep_shapes=TRUE,sys=TRUE)}
 polygons$nom=names
 polygons$wikipedia=wikipedia
+if(shape=="france"){
+  polygons=st_union(polygons)
+  polygons=st_as_sf(polygons)
+  polygons$nom="France"
+}
 object.size(polygons)
 
 
 # Saving data
-if(!file.exists(paste0(path,"output/",shape,"FR",name))){
-  dir.create(paste0(path,"output/",shape,"FR",name))
+if(!file.exists(paste0(path,"/data/shapes_administration/output/",shape,name))){
+  dir.create(paste0(path,"/data/shapes_administration/output/",shape,name))
 }else{
-  unlink(paste0(path,"output/",shape,"FR",name),recursive=TRUE)
-  dir.create(paste0(path,"output/",shape,"FR",name))
+  unlink(paste0(path,"/data/shapes_administration/output/",shape,name),recursive=TRUE)
+  dir.create(paste0(path,"/data/shapes_administration/output/",shape,name))
 }
-st_write(polygons,paste0(path,"output/",shape,"FR",name,"/",shape,"FR",name,".shp"),layer_options="ENCODING=UTF-8")
-# polygons=st_read(paste0(path,"output/",shape,"FR",name),options="ENCODING=UTF-8")
+st_write(polygons,paste0(path,"/data/shapes_administration/output/",shape,name,"/",shape,name,".shp"),layer_options="ENCODING=UTF-8")
+# polygons=st_read(paste0(path,"/data/shapes_administration/output/",shape,name),options="ENCODING=UTF-8")
 
 
 # Plot test polygons and SAFRAN mesh
-grid=st_read("C:/Users/mgarnault/Documents/CSTEcophyto/data/mailles_safran/output/SAFRANgrid_handmade",options="ENCODING=UTF-8")
+grid=st_read(paste0(path,"/data/mailles_safran/output/SAFRANgrid_handmade"),options="ENCODING=UTF-8")
 
 polygons$color=sample(1:100,nrow(polygons),replace=TRUE)
 x11()
@@ -110,40 +117,3 @@ ggplot()+
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         panel.background=element_blank())
-
-
-
-
-
-
-
-
-
-
-
-# EXAMPLE OF HOW TO COMPUTE THE FRACTION EACH SUBGRID WITHIN SPATIAL POLYGON
-soil <- st_read(system.file("external/lux.shp", package="raster")) %>% 
-  # add in some fake soil type data
-  mutate(soil = LETTERS[c(1:6,1:6)])
-
-# field polygons
-field <- c("POLYGON((6 49.75,6 50,6.4 50,6.4 49.75,6 49.75))",
-           "POLYGON((5.8 49.5,5.8 49.7,6.2 49.7,6.2 49.5,5.8 49.5))") %>% 
-  st_as_sfc(crs = st_crs(soil)) %>% 
-  st_sf(field = c('x','y'), geoms = ., stringsAsFactors = FALSE)
-
-# intersect - note that sf is intelligent with attribute data!
-pi <- st_intersection(soil, field)
-plot(soil$geometry, axes = TRUE)
-plot(field$geoms, add = TRUE)
-plot(pi$geometry, add = TRUE, col = 'red')
-
-# add in areas in m2
-attArea <- pi %>% 
-  mutate(area = st_area(.) %>% as.numeric())
-
-# for each field, get area per soil type
-attArea %>% 
-  as_tibble() %>% 
-  group_by(field, soil) %>% 
-  summarize(area = sum(area))
