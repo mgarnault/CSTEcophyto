@@ -48,33 +48,98 @@ setwd(path)
 
 
 # Global variables
+# weather=read.table(paste0(path,"/data/meteo_safran/raw/guillaumeHarel/siclima_extraction_401_20210413.csv"),sep=";",header=TRUE,stringsAsFactors=FALSE)
+
+# quantile(weather$t_q,c(.05,.95))
+colFunction=colorRampPalette(c("#ad4bff","#4e4bff","#4bfffc","#4bff59","#fcff3b","#ff3b3b","#b22727"))
+paletteTemperature=colFunction(length(seq(-5,30,.1)))
+names(paletteTemperature)=round(seq(-5,30,.1),1)
+# hist(weather$t_q,nclass=100,xlim=c(-5,30))
+# points(x=as.numeric(names(paletteTemperature)),
+#        y=rep(300000,length(paletteTemperature)),
+#        col=paletteTemperature,pch=15,cex=2)
+
+# quantile(weather$preliq_q,c(.05,.95))
+colFunction=colorRampPalette(c("#ffffb1","#c9ff6a","#51ff43","#5cf8f6","#5bbfff","#5b6aff","#0017ff"))
+paletteRain=colFunction(length(seq(0,10,.1)))
+names(paletteRain)=round(seq(0,10,.1),1)
+# hist(weather$preliq_q,nclass=1000,xlim=c(0,10))
+# points(x=as.numeric(names(paletteRain)),
+#        y=rep(5000000,length(paletteRain)),
+#        col=paletteRain,pch=15,cex=2)
+
+# quantile(weather$hu_q,c(.05,.95))
+colFunction=colorRampPalette(c("#ff4343","#e7e7e7","#4a47ff"))
+paletteMoisture=colFunction(length(seq(50,100,.1)))
+names(paletteMoisture)=round(seq(50,100,.1),1)
+# hist(weather$hu_q,nclass=100,xlim=c(50,100))
+# points(x=as.numeric(names(paletteMoisture)),
+#        y=rep(300000,length(paletteMoisture)),
+#        col=paletteMoisture,pch=15,cex=2)
+
+# quantile(weather$ff_q,c(.05,.95))
+colFunction=colorRampPalette(c("#00ded7","#00de1b","#fffc00","#de0000","#895e00","#000000"))
+paletteWind=colFunction(length(seq(0,8,.1)))
+names(paletteWind)=round(seq(0,8,.1),1)
+# hist(weather$ff_q,nclass=100,xlim=c(0,8))
+# points(x=as.numeric(names(paletteWind)),
+#        y=rep(600000,length(paletteWind)),
+#        col=paletteWind,pch=15,cex=2)
+
+# quantile(weather$dli_q,c(.05,.95))
+colFunction=colorRampPalette(c("#00fff7","#00ff08","#f7ff00","#ff9300","#ff0000","#680000"))
+paletteRadiation=colFunction(length(seq(2000,3500,1)))
+names(paletteRadiation)=round(seq(2000,3500,1))
+# hist(weather$dli_q,nclass=100,xlim=c(2000,3500))
+# points(x=as.numeric(names(paletteRadiation)),
+#        y=rep(300000,length(paletteRadiation)),
+#        col=paletteRadiation,pch=15,cex=2)
+
+# quantile(weather$tsup_h_q,c(.05,.95))
+colFunction=colorRampPalette(c("#fffb00","#ff0000","#760000"))
+paletteTsup=colFunction(length(seq(5,40,.1)))
+names(paletteTsup)=round(seq(5,40,.1),1)
+# hist(weather$tsup_h_q,nclass=100,xlim=c(5,40))
+# points(x=as.numeric(names(paletteTsup)),
+#        y=rep(300000,length(paletteTsup)),
+#        col=paletteTsup,pch=15,cex=2)
+
+# quantile(weather$tinf_h_q,c(.05,.95))
+colFunction=colorRampPalette(c("#0017ff","#00f7ff","#00ff04"))
+paletteTinf=colFunction(length(seq(-15,20,.1)))
+names(paletteTinf)=round(seq(-15,20,.1),1)
+# hist(weather$tinf_h_q,nclass=100,xlim=c(-15,20))
+# points(x=as.numeric(names(paletteTinf)),
+#        y=rep(300000,length(paletteTinf)),
+#        col=paletteTinf,pch=15,cex=2)
+
 SAFRANvarList=list(#"Concentration de CO2 [ppm]"="co2",
-                   #"Contenu en eau gelée dans la couche de racinaire à 06 UTC [m³/m³]"="wgi_racine_q",
-                   #"Contenu en eau liquide dans la couche racinaire à 06 UTC [m³/m³]"="wg_racine_q",
-                   #"Drainage (cumul quotidien 06-06 UTC) [mm]"="drainc_q",
-                   #"Ecoulement à la base du manteau neigeux [mm]"="ecoulement_q",
-                   #"Epaisseur du manteau neigeux (moyenne quotidienne 06-06 UTC) [m]"="hteurneige_q",
-                   #"Epaisseur du manteau neigeux maximum au cours de la journée [m]"="hteurneigex_q",
-                   #"Epaisseur du manteau neigeux à 06 UTC [m]"="hteurneige6_q",
-                   #"Equivalent en eau du manteau neigeux (moyenne quotidienne 06-06 UTC) [mm]"="resr_neige_q",
-                   #"Equivalent en eau du manteau neigeux à 06 UTC [mm]"="resr_neige6_q",
-                   #"Evapotranspiration potentielle (formule de Penman-Monteith) [mm]"="etp_q",
-                   #"Evapotranspiration potentielle calculée par SICLIMA (formule de Penman-Monteith) [mm]"="etppm",
-                   #"Evapotranspiration réelle (cumul quotidien 06-06 UTC) [mm]"="evap_q",
-                   #"Fraction recouverte par la neige (moyenne quotidienne 06-06 UTC) [%]"="snow_frac_q",
-                   "Humidité relative (moyenne quotidienne) [%]"="hu_q",
-                   #"Humidité spécifique (moyenne quotidienne) [g/kg]"="q_q",
-                   #"Indice d’humidité des sols (moyenne quotidienne 06-06 UTC) [%]"="swi_q",
-                   #"Pluies efficaces (cumul quotidien) [mm]"="pe_q",
-                   "Précipitations liquides (cumul quotidien 06-06 UTC) [mm]"="preliq_q",
-                   #"Précipitations solides (cumul quotidien 06-06 UTC) [mm]"="prenei_q",
-                   "Rayonnement atmosphérique (cumul quotidien) [J/cm²]"="dli_q",
-                   #"Rayonnement visible (cumul quotidien) [J/cm²]"="ssi_q",
-                   #"Ruissellement (cumul quotidien 06-06 UTC) [mm]"="runc_q",
-                   "Température (moyenne quotidienne) [°C]"="t_q",
-                   "Température maximale des 24 températures horaires [°C]"="tsup_h_q",
-                   "Température minimale des 24 températures horaires [°C]"="tinf_h_q",
-                   "Vent à 10m (moyenne quotidienne) [m/s]"="ff_q")
+  #"Contenu en eau gelée dans la couche de racinaire à 06 UTC [m³/m³]"="wgi_racine_q",
+  #"Contenu en eau liquide dans la couche racinaire à 06 UTC [m³/m³]"="wg_racine_q",
+  #"Drainage (cumul quotidien 06-06 UTC) [mm]"="drainc_q",
+  #"Ecoulement à la base du manteau neigeux [mm]"="ecoulement_q",
+  #"Epaisseur du manteau neigeux (moyenne quotidienne 06-06 UTC) [m]"="hteurneige_q",
+  #"Epaisseur du manteau neigeux maximum au cours de la journée [m]"="hteurneigex_q",
+  #"Epaisseur du manteau neigeux à 06 UTC [m]"="hteurneige6_q",
+  #"Equivalent en eau du manteau neigeux (moyenne quotidienne 06-06 UTC) [mm]"="resr_neige_q",
+  #"Equivalent en eau du manteau neigeux à 06 UTC [mm]"="resr_neige6_q",
+  #"Evapotranspiration potentielle (formule de Penman-Monteith) [mm]"="etp_q",
+  #"Evapotranspiration potentielle calculée par SICLIMA (formule de Penman-Monteith) [mm]"="etppm",
+  #"Evapotranspiration réelle (cumul quotidien 06-06 UTC) [mm]"="evap_q",
+  #"Fraction recouverte par la neige (moyenne quotidienne 06-06 UTC) [%]"="snow_frac_q",
+  "Humidité relative (moyenne quotidienne) [%]"=list(name="hu_q",legend=paletteMoisture),
+  #"Humidité spécifique (moyenne quotidienne) [g/kg]"="q_q",
+  #"Indice d’humidité des sols (moyenne quotidienne 06-06 UTC) [%]"="swi_q",
+  #"Pluies efficaces (cumul quotidien) [mm]"="pe_q",
+  "Précipitations liquides (cumul quotidien 06-06 UTC) [mm]"=list(name="preliq_q",legend=paletteRain),
+  #"Précipitations solides (cumul quotidien 06-06 UTC) [mm]"="prenei_q",
+  "Rayonnement atmosphérique (cumul quotidien) [J/cm²]"=list(name="dli_q",legend=paletteRadiation),
+  #"Rayonnement visible (cumul quotidien) [J/cm²]"="ssi_q",
+  #"Ruissellement (cumul quotidien 06-06 UTC) [mm]"="runc_q",
+  "Température (moyenne quotidienne) [°C]"=list(name="t_q",legend=paletteTemperature),
+  "Température maximale des 24 températures horaires [°C]"=list(name="tsup_h_q",legend=paletteTsup),
+  "Température minimale des 24 températures horaires [°C]"=list(name="tinf_h_q",legend=paletteTinf),
+  "Vent à 10m (moyenne quotidienne) [m/s]"=list(name="ff_q",legend=paletteWind))
 
 polygonsCom=st_read(paste0(path,"/data/shapes_administration/output/communes_metropole_lite"),options="ENCODING=UTF-8",quiet=TRUE)
 polygonsDep=st_read(paste0(path,"/data/shapes_administration/output/departements_metropole_lite"),options="ENCODING=UTF-8",quiet=TRUE)
@@ -194,7 +259,7 @@ server=function(input,output,session){
     
     
     if(length(timeRangeYears)==1){ # the time range asked by the user span over only one year
-      variable=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]
+      variable=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$name
       
       show_modal_spinner(spin="orbit",text="Importation des données",color="#08298A")
       
@@ -222,6 +287,7 @@ server=function(input,output,session){
       
       if(input$scaleToPlotSAFRAN=="Mailles SAFRAN"){
         polygons=grid
+        if(variable=="dli_q"){polygons$variable=round(polygons$variable)}else{polygons$variable=round(polygons$variable,1)}
       }else{
         if(input$scaleToPlotSAFRAN=="Départements"){
           polygons=polygonsDep
@@ -233,33 +299,44 @@ server=function(input,output,session){
         
         polygons=polygons[,which(colnames(polygons)%in%c("geometry","nom"))]
         
-        intersections=st_intersection(grid,polygons)
+        suppressWarnings({
+          intersections=st_intersection(grid,polygons)
+        })
         intersections$area=as.numeric(st_area(intersections))
         
         polygons$variable=apply(polygons,1,function(row){
           intersects=intersections[which(intersections$nom==row["nom"] & !is.na(intersections$variable)),]
-          return(sum(intersects$variable*intersects$area)/sum(intersects$area))
+          result=sum(intersects$variable*intersects$area)/sum(intersects$area)
+          if(variable=="dli_q"){result=round(result)}else{result=round(result,1)}
+          return(result)
         })
       }
       
       remove_modal_spinner()
       show_modal_spinner(spin="orbit",text="Création du graphique",color="#08298A")
       
+      legend=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$legend
+      polygons$color=apply(polygons,1,function(row){
+        if(is.na(row["variable"])){
+          return("#898989")
+        }else{
+          return(legend[which(as.numeric(names(legend))==as.numeric(row["variable"]))])
+        }
+      })
+
       p=ggplot()+
-        geom_sf(aes(fill=variable),col=NA,data=polygons)+
-        scale_fill_gradient2(low="#4444fe",mid="#f8fe44",high="#fe4444",
-                             midpoint=mean(grid$variable,na.rm=TRUE))+
-        theme(legend.position="bottom",
-              legend.box="horizontal",
+        geom_sf(fill=polygons$color,col=NA,data=polygons)+
+        theme(legend.position="none",
               panel.grid=element_blank(),
               panel.background=element_rect(fill="white"),
               axis.line=element_line(colour="black"),
               plot.title=element_text(size=17,hjust=0.5))+
-        guides(fill=guide_colourbar(title=input$variableToPlotSAFRAN,title.position="top",title.hjust=0.5))+
         ggtitle(paste0(" Variable : ",input$variableToPlotSAFRAN,
                        "\n Plage temporelle : ",input$timeRangeSAFRAN[1]," au ",input$timeRangeSAFRAN[2]," (moyenne)",
                        "\n Résolution spatiale : ",input$scaleToPlotSAFRAN))
-
+      
+      ##### !!!! PREPARER LA LEGENDE A L AVANCE POUR TOUTES LES VARIABLES CLIMATIQUES ET L IMPORTER LORS DE LA CREATION DU GRAPHIQUE POLYGONE
+      
       for(border in input$bordersToPlotSAFRAN){
         if(border=="Mailles SAFRAN"){
           p=p+geom_sf(col="black",fill=NA,data=polygonsSaf)
@@ -310,8 +387,7 @@ server=function(input,output,session){
   observeEvent(input$saveCarto,{
     if(!is.null(cartographySAFRAN())){
       savePath=choose.dir()
-      print(savePath)
-      
+
       if(is.na(savePath)){
         return(NULL)
       }else{

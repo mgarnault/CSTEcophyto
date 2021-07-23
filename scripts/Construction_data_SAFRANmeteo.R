@@ -61,8 +61,6 @@ polygons=polygons[,which(colnames(polygons)%in%c("geometry","nom"))]
 grid=grid[,which(colnames(grid)%in%c("geometry","var","mll_sfr"))]
 intersections=st_intersection(grid,polygons)
 intersections$area=as.numeric(st_area(intersections))
-
-
 # sum(intersections$var*intersections$area)/sum(intersections$area) # pour 1 région
 
 intersections2=intersections#[which(intersections$nom=="Nouvelle-Aquitaine"),]
