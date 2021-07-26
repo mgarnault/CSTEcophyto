@@ -46,6 +46,9 @@ library("shinybusy")
 # install.packages("DT")
 library("DT")
 
+# install.packages("Hmisc")
+library("Hmisc")
+
 # Working directory
 path=dirname(rstudioapi::getSourceEditorContext()$path)
 path=substr(path,1,(as.numeric(gregexpr("/scripts",dirname(rstudioapi::getSourceEditorContext()$path)))-1))
@@ -62,7 +65,7 @@ makeLegend=function(palette,breaks,title){
                                 max(values)+(length(c(min(values):max(values)))/20)),
                        expand=c(0,0))+
     scale_y_continuous(limits=c(0,1),expand=c(0,0))+
-    geom_point(aes(x=values,y=0.5),shape=15,size=10,col=colors)+
+    geom_tile(aes(x=values,y=0.5),height=0.2,width=(values[2]-values[1]),fill=colors,col=NA)+
     geom_segment(aes(x=breaks,xend=breaks,y=0.43,yend=0.27),size=.8)+
     geom_text(aes(x=breaks,y=0.25,label=names(breaks)),hjust=0.5,vjust=1,size=5)+
     geom_text(aes(x=mean(breaks),y=0.75,label=title),
@@ -78,25 +81,33 @@ makeLegend=function(palette,breaks,title){
 
 # quantile(weather$t_q,c(.05,.95))
 colFunction=colorRampPalette(c("#ad4bff","#4e4bff","#4bfffc","#4bff59","#fcff3b","#ff3b3b","#b22727"))
-paletteTemperature=colFunction(length(seq(-5,30,.1)))
-names(paletteTemperature)=round(seq(-5,30,.1),1)
+paletteTemperature=colFunction(length(seq(0,25,.1)))
+names(paletteTemperature)=round(seq(0,25,.1),1)
+# paletteTemperature=colFunction(length(seq(-5,30,.1)))
+# names(paletteTemperature)=round(seq(-5,30,.1),1)
 # hist(weather$t_q,nclass=100,xlim=c(-5,30))
 # points(x=as.numeric(names(paletteTemperature)),
 #        y=rep(300000,length(paletteTemperature)),
 #        col=paletteTemperature,pch=15,cex=2)
-breaksTemperature=c(-5,0,5,10,15,20,25,30)
-names(breaksTemperature)=c("<-5","0","5","10","15","20","25",">30")
+breaksTemperature=c(0,5,10,15,20,25)
+names(breaksTemperature)=c("<0","5","10","15","20",">25")
+# breaksTemperature=c(-5,0,5,10,15,20,25,30)
+# names(breaksTemperature)=c("<-5","0","5","10","15","20","25",">30")
 
 # quantile(weather$preliq_q,c(.05,.95))
 colFunction=colorRampPalette(c("#ffffb1","#c9ff6a","#51ff43","#5cf8f6","#5bbfff","#5b6aff","#0017ff"))
-paletteRain=colFunction(length(seq(0,10,.1)))
-names(paletteRain)=round(seq(0,10,.1),1)
+paletteRain=colFunction(length(seq(0,8,.1)))
+names(paletteRain)=round(seq(0,8,.1),1)
+# paletteRain=colFunction(length(seq(0,10,.1)))
+# names(paletteRain)=round(seq(0,10,.1),1)
 # hist(weather$preliq_q,nclass=1000,xlim=c(0,10))
 # points(x=as.numeric(names(paletteRain)),
 #        y=rep(5000000,length(paletteRain)),
 #        col=paletteRain,pch=15,cex=2)
-breaksRain=c(0,1,2,3,4,5,6,7,8,9,10)
-names(breaksRain)=c("0","1","2","3","4","5","6","7","8","9",">10")
+breaksRain=c(0,1,2,3,4,5,6,7,8)
+names(breaksRain)=c("0","1","2","3","4","5","6","7",">8")
+# breaksRain=c(0,1,2,3,4,5,6,7,8,9,10)
+# names(breaksRain)=c("0","1","2","3","4","5","6","7","8","9",">10")
 
 # quantile(weather$hu_q,c(.05,.95))
 colFunction=colorRampPalette(c("#ff4343","#e7e7e7","#4a47ff"))
@@ -133,25 +144,33 @@ names(breaksRadiation)=c("<2000","2250","2500","2750","3000","3250",">3500")
 
 # quantile(weather$tsup_h_q,c(.05,.95))
 colFunction=colorRampPalette(c("#fffb00","#ff0000","#760000"))
-paletteTsup=colFunction(length(seq(5,40,.1)))
-names(paletteTsup)=round(seq(5,40,.1),1)
+paletteTsup=colFunction(length(seq(5,30,.1)))
+names(paletteTsup)=round(seq(5,30,.1),1)
+# paletteTsup=colFunction(length(seq(5,40,.1)))
+# names(paletteTsup)=round(seq(5,40,.1),1)
 # hist(weather$tsup_h_q,nclass=100,xlim=c(5,40))
 # points(x=as.numeric(names(paletteTsup)),
 #        y=rep(300000,length(paletteTsup)),
 #        col=paletteTsup,pch=15,cex=2)
-breaksTsup=c(5,10,15,20,25,30,35,40)
-names(breaksTsup)=c("<5","10","15","20","25","30","35",">40")
+breaksTsup=c(5,10,15,20,25,30)
+names(breaksTsup)=c("<5","10","15","20","25",">30")
+# breaksTsup=c(5,10,15,20,25,30,35,40)
+# names(breaksTsup)=c("<5","10","15","20","25","30","35",">40")
 
 # quantile(weather$tinf_h_q,c(.05,.95))
 colFunction=colorRampPalette(c("#0017ff","#00f7ff","#00ff04"))
-paletteTinf=colFunction(length(seq(-15,20,.1)))
-names(paletteTinf)=round(seq(-15,20,.1),1)
+paletteTinf=colFunction(length(seq(-5,20,.1)))
+names(paletteTinf)=round(seq(-5,20,.1),1)
+# paletteTinf=colFunction(length(seq(-15,20,.1)))
+# names(paletteTinf)=round(seq(-15,20,.1),1)
 # hist(weather$tinf_h_q,nclass=100,xlim=c(-15,20))
 # points(x=as.numeric(names(paletteTinf)),
 #        y=rep(300000,length(paletteTinf)),
 #        col=paletteTinf,pch=15,cex=2)
-breaksTinf=c(-15,-10,-5,0,5,10,15,20)
-names(breaksTinf)=c("<-15","-10","-5","0","5","10","15",">20")
+breaksTinf=c(-5,0,5,10,15,20)
+names(breaksTinf)=c("<-5","0","5","10","15",">20")
+# breaksTinf=c(-15,-10,-5,0,5,10,15,20)
+# names(breaksTinf)=c("<-15","-10","-5","0","5","10","15",">20")
 
 SAFRANvarList=list(
   # "Concentration de CO2 [ppm]"="co2",
@@ -189,6 +208,17 @@ polygonsFra=st_read(paste0(path,"/data/shapes_administration/output/france_metro
 polygonsSaf=st_read(paste0(path,"/data/mailles_safran/output/SAFRANgrid_handmade"),options="ENCODING=UTF-8",quiet=TRUE)
 polygonsSaf=polygonsSaf[-which(is.na(polygonsSaf$dprtmnt)),]
 
+dataPolygonsSaf=as.data.frame(polygonsSaf[,which(colnames(polygonsSaf)%in%
+                                       c("clc_211","clc_221","clc_222","clc_231","clc_241","clc_242","clc_311","clc_312","clc_313"))])
+dataPolygonsSaf=dataPolygonsSaf[,-ncol(dataPolygonsSaf)]
+hist(rowSums(dataPolygonsSaf))
+
+polygonsSaf$Forêts=rowSums(dataPolygonsSaf[,which(colnames(dataPolygonsSaf)%in%c("clc_311","clc_312","clc_313"))])
+polygonsSaf$Champs=rowSums(dataPolygonsSaf[,which(colnames(dataPolygonsSaf)%in%c("clc_241","clc_242","clc_211"))])
+polygonsSaf$Prairies=dataPolygonsSaf[,which(colnames(dataPolygonsSaf)%in%c("clc_231"))]
+polygonsSaf$Vergers=dataPolygonsSaf[,which(colnames(dataPolygonsSaf)%in%c("clc_222"))]
+polygonsSaf$Vignes=dataPolygonsSaf[,which(colnames(dataPolygonsSaf)%in%c("clc_221"))]
+
 
 
 
@@ -198,7 +228,7 @@ polygonsSaf=polygonsSaf[-which(is.na(polygonsSaf$dprtmnt)),]
 # USER INTERFACE #
 ui=dashboardPage(
   dashboardHeader(title="CST Ecophyto II+ Tool"),
-  dashboardSidebar(width=350,
+  dashboardSidebar(
                    sidebarMenu(id="sidebarmenu",
                                menuItem("Météo SAFRAN",tabName="SAFRAN",icon=icon("temperature-high")),
                                conditionalPanel("input.sidebarmenu=='SAFRAN'",
@@ -209,51 +239,65 @@ ui=dashboardPage(
                                                 fluidRow(column(12,pickerInput("scaleToPlotSAFRAN","Résolution spatiale",
                                                                                choices=c("Mailles SAFRAN","Départements","Régions","France entière"),
                                                                                multiple=FALSE))),
-                                                fluidRow(column(12,pickerInput("bordersToPlotSAFRAN","Découpages spatiaux à afficher",
+                                                fluidRow(column(12,pickerInput("bordersToPlotSAFRAN","Frontières spatiales à afficher",
                                                                                choices=c("Mailles SAFRAN","Communes","Départements","Régions","France entière"),
                                                                                multiple=TRUE))),
-                                                fluidRow(column(12,prettySwitch(inputId="showMeshCharac",label="Afficher les contraintes appliquées aux mailles",status="primary",slim=TRUE))),
+                                                fluidRow(column(12,awesomeCheckbox(inputId="showMeshCharac",label="Affichage des contraintes appliquées aux mailles SAFRAN",status="primary"))),
                                                 conditionalPanel("input.showMeshCharac==1",
                                                                  fluidRow(column(1),
                                                                           column(11,sliderInput("altitudeMeshSAFRAN","Altitude moyenne [m]",
                                                                                                 0,3000,c(0,1000),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("meadowMeshSAFRAN","Prairies [%]",
+                                                                 #                                0,100,c(0,80),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("fieldMeshSAFRAN","Systèmes culturaux et parcellaires complexes [%]",
+                                                                 #                                0,100,c(0,100),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("fieldNoIrrigationMeshSAFRAN","Terres arables hors périmètres d’irrigation [%]",
+                                                                 #                                0,100,c(0,100),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("orchardMeshSAFRAN","Vergers et petits fruits [%]",
+                                                                 #                                0,100,c(0,100),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("vineyardMeshSAFRAN","Vignoble [%]",
+                                                                 #                                0,100,c(0,100),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("hardwoodForestMeshSAFRAN","Forêts de feuillus [%]",
+                                                                 #                                0,100,c(0,80),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("coniferousForestMeshSAFRAN","Forêts de conifères [%]",
+                                                                 #                                0,100,c(0,80),ticks=FALSE))),
+                                                                 # fluidRow(column(1),
+                                                                 #          column(11,sliderInput("mixedForestMeshSAFRAN","Forêts mélangées [%]",
+                                                                 #                                0,100,c(0,80),ticks=FALSE)))
+                                                                 fluidRow(column(1),
+                                                                          column(11,sliderInput("forestMeshSAFRAN","Forêts [%]",
+                                                                                                0,100,c(0,75),ticks=FALSE))),
                                                                  fluidRow(column(1),
                                                                           column(11,sliderInput("meadowMeshSAFRAN","Prairies [%]",
-                                                                                                0,100,c(0,80),ticks=FALSE))),
+                                                                                                0,100,c(0,75),ticks=FALSE))),
                                                                  fluidRow(column(1),
-                                                                          column(11,sliderInput("fieldMeshSAFRAN","Systèmes culturaux et parcellaires complexes [%]",
+                                                                          column(11,sliderInput("fieldMeshSAFRAN","Cultures annuelles [%]",
                                                                                                 0,100,c(0,100),ticks=FALSE))),
                                                                  fluidRow(column(1),
-                                                                          column(11,sliderInput("fieldNoIrrigationMeshSAFRAN","Terres arables hors périmètres d’irrigation [%]",
+                                                                          column(11,sliderInput("orchardMeshSAFRAN","Vergers [%]",
                                                                                                 0,100,c(0,100),ticks=FALSE))),
                                                                  fluidRow(column(1),
-                                                                          column(11,sliderInput("orchardMeshSAFRAN","Vergers et petits fruits [%]",
-                                                                                                0,100,c(0,100),ticks=FALSE))),
-                                                                 fluidRow(column(1),
-                                                                          column(11,sliderInput("vineyardMeshSAFRAN","Vignoble [%]",
-                                                                                                0,100,c(0,100),ticks=FALSE))),
-                                                                 fluidRow(column(1),
-                                                                          column(11,sliderInput("hardwoodForestMeshSAFRAN","Forêts de feuillus [%]",
-                                                                                                0,100,c(0,80),ticks=FALSE))),
-                                                                 fluidRow(column(1),
-                                                                          column(11,sliderInput("coniferousForestMeshSAFRAN","Forêts de conifères [%]",
-                                                                                                0,100,c(0,80),ticks=FALSE))),
-                                                                 fluidRow(column(1),
-                                                                          column(11,sliderInput("mixedForestMeshSAFRAN","Forêts mélangées [%]",
-                                                                                                0,100,c(0,80),ticks=FALSE)))),
+                                                                          column(11,sliderInput("vineyardMeshSAFRAN","Vignobles [%]",
+                                                                                                0,100,c(0,100),ticks=FALSE)))
+                                                                 ),
                                                 fluidRow(column(12,align="center",actionBttn("go","Go",icon=icon("sync-alt"))))),
                                hr(),
                                menuItem("Vente Phytos",tabName="BNVD",icon=icon("spray-can")))),
   dashboardBody(
     tabItems(tabItem(tabName="SAFRAN",
                      fluidRow(column(8,
-                                     box(title=p("Cartographie des données SAFRAN",
-                                                 actionBttn("saveCarto",label=NULL,style="simple",color="success",icon=icon("save"))),
+                                     box(title=p("Cartographie",uiOutput("buttonSaveCartoSAFRAN",inline=TRUE)),
                                          width=12,solidHeader=TRUE,status="primary",plotOutput("cartographySAFRAN",width="100%",height=600))),
                               column(4,
-                                     box(title=p("Tableau des moyennes",
-                                                 actionBttn("saveTable",label=NULL,style="simple",color="success",icon=icon("save"))),
-                                         width=12,solidHeader=TRUE,status="primary",dataTableOutput("tableSAFRAN"))))
+                                     box(title=p("Tableau de données",uiOutput("buttonSaveTableSAFRAN",inline=TRUE)),
+                                         width=12,solidHeader=TRUE,status="primary",div(dataTableOutput("tableSAFRAN",width="100%",height=600),style="font-size:80%"))))
     ),
     tabItem(tabName="BNVD",h2("Graphique d'utilisation des PPP"))
     )
@@ -266,18 +310,68 @@ ui=dashboardPage(
 # SERVER #
 server=function(input,output,session){
   
-  weatherSAFRAN=reactiveVal(NULL)
-  cartographySAFRAN=reactiveVal(NULL)
-  legendSAFRAN=reactiveVal(NULL)
-  tableSAFRAN=reactiveVal(NULL)
   timeRangeSAFRAN=reactiveVal(NULL)
   variableToPlotSAFRAN=reactiveVal(NULL)
   scaleToPlotSAFRAN=reactiveVal(NULL)
   
+  weatherSAFRAN=reactiveVal(NULL)
+  tableSAFRAN=reactiveVal(NULL)
+  
+  cartographySAFRAN=reactiveVal(NULL)
+  legendSAFRAN=reactiveVal(NULL)
+  
+  paletteSAFRAN=reactiveVal(NULL)
+  polygonsSAFRAN=reactiveVal(NULL)
+  
+  altitudeMeshSAFRAN=reactiveVal(NULL)
+  # meadowMeshSAFRAN=reactiveVal(NULL)
+  # fieldMeshSAFRAN=reactiveVal(NULL)
+  # fieldNoIrrigationMeshSAFRAN=reactiveVal(NULL)
+  # orchardMeshSAFRAN=reactiveVal(NULL)
+  # vineyardMeshSAFRAN=reactiveVal(NULL)
+  # hardwoodForestMeshSAFRAN=reactiveVal(NULL)
+  # coniferousForestMeshSAFRAN=reactiveVal(NULL)
+  # mixedForestMeshSAFRAN=reactiveVal(NULL)
+  forestMeshSAFRAN=reactiveVal(NULL)
+  meadowMeshSAFRAN=reactiveVal(NULL)
+  fieldMeshSAFRAN=reactiveVal(NULL)
+  orchardMeshSAFRAN=reactiveVal(NULL)
+  vineyardMeshSAFRAN=reactiveVal(NULL)
+
+  resetReactiveVal=function(){
+    timeRangeSAFRAN(NULL)
+    variableToPlotSAFRAN(NULL)
+    scaleToPlotSAFRAN(NULL)
+    
+    weatherSAFRAN(NULL)
+    legendSAFRAN(NULL)
+    
+    cartographySAFRAN(NULL)
+    tableSAFRAN(NULL)
+
+    paletteSAFRAN(NULL)
+    polygonsSAFRAN(NULL)
+    
+    altitudeMeshSAFRAN(NULL)
+    # meadowMeshSAFRAN(NULL)
+    # fieldMeshSAFRAN(NULL)
+    # fieldNoIrrigationMeshSAFRAN(NULL)
+    # orchardMeshSAFRAN(NULL)
+    # vineyardMeshSAFRAN(NULL)
+    # hardwoodForestMeshSAFRAN(NULL)
+    # coniferousForestMeshSAFRAN(NULL)
+    # mixedForestMeshSAFRAN(NULL)
+    forestMeshSAFRAN(NULL)
+    meadowMeshSAFRAN(NULL)
+    fieldMeshSAFRAN(NULL)
+    orchardMeshSAFRAN(NULL)
+    vineyardMeshSAFRAN(NULL)
+  }
+  
   observeEvent(input$go,{
     gc()
     
-    if(input$timeRangeSAFRAN[2]<input$timeRangeSAFRAN[1]){ # test if the first date of the time range asked by the user is actually before the second one
+    if(input$timeRangeSAFRAN[2]<input$timeRangeSAFRAN[1]){ # test if the first date of the time range asked by the user actually precede the second
       sendSweetAlert(session, # display an error message if not
                      title="Erreur",
                      type="error",
@@ -285,21 +379,14 @@ server=function(input,output,session){
                                  se situe après la seconde (",input$timeRangeSAFRAN[2],"). 
                                  Veuillez renseigner une plage temporelle où la première 
                                  date précède la seconde."))
-      weatherSAFRAN(NULL)
-      cartographySAFRAN(NULL)
-      legendSAFRAN(NULL)
-      tableSAFRAN(NULL)
-      timeRangeSAFRAN(NULL)
-      variableToPlotSAFRAN(NULL)
-      scaleToPlotSAFRAN(NULL)
+      resetReactiveVal()
       return(NULL)
     }
     
     suppressWarnings({
       dataYears=as.numeric(list.files(paste0(path,"/data/meteo_safran/output"))) # folder names found in ~/CSTEcophyto/data/meteo_safran/output 
     })
-    
-    if(length(which(is.na(dataYears)))>0){ # test if folder names within ~/CSTEcophyto/data/meteo_safran/output are numeric values (i.e. years)
+    if(length(which(is.na(dataYears)))>0){ # test if every folder names within ~/CSTEcophyto/data/meteo_safran/output corresponds to a numeric value (i.e. a year)
       errorFoldersDataYear=list.files(paste0(path,"/data/meteo_safran/output"))[
         which(is.na(dataYears))] # computes folders that are not numeric values (i.e. years)
       
@@ -309,19 +396,12 @@ server=function(input,output,session){
                      text=paste0("Le dossier ~/CSTEcophyto/data/meteo_safran/output
                      contient un ou des dossier(s) dont le nom ne peut être interprété
                      par une année : ",paste(errorFoldersDataYear,collapse = " et ")))
-      weatherSAFRAN(NULL)
-      cartographySAFRAN(NULL)
-      legendSAFRAN(NULL)
-      tableSAFRAN(NULL)
-      timeRangeSAFRAN(NULL)
-      variableToPlotSAFRAN(NULL)
-      scaleToPlotSAFRAN(NULL)
+      resetReactiveVal()
       return(NULL)
     }
     
     timeRangeDays=seq(input$timeRangeSAFRAN[1],input$timeRangeSAFRAN[2],by="days") # determines sequence of days from the begin to the end of the time range asked by the user
     timeRangeYears=unique(format(timeRangeDays,format="%Y")) # keeps only years from the time range asked by the user
-    
     if(!all(timeRangeYears%in%dataYears)){ # test if years asked by the user actually exist in the SAFRAN database
       timeRangesData=split(dataYears,cumsum(c(1,diff(dataYears)!=1))) # computes time ranges available in the SAFRAN database
       timeRangesData=lapply(timeRangesData,function(element){
@@ -337,20 +417,11 @@ server=function(input,output,session){
                      temporelle demandée (du ",input$timeRangeSAFRAN[1]," au ",input$timeRangeSAFRAN[2],
                                  "). Les années disponibles dans la base données SAFRAN sont : ",
                                  timeRangesData))
-      weatherSAFRAN(NULL)
-      cartographySAFRAN(NULL)
-      legendSAFRAN(NULL)
-      tableSAFRAN(NULL)
-      timeRangeSAFRAN(NULL)
-      variableToPlotSAFRAN(NULL)
-      scaleToPlotSAFRAN(NULL)
+      resetReactiveVal()
       return(NULL)
     }
     
-    show_modal_spinner(spin="orbit",text="Importation des données",color="#08298A")
-    variable=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$name
-    
-    importation=TRUE
+    importation=TRUE # test if the application actually needs to re-import weather data
     if(!is.null(variableToPlotSAFRAN()) & !is.null(timeRangeSAFRAN())){
       if(input$variableToPlotSAFRAN==variableToPlotSAFRAN() &
          all(input$timeRangeSAFRAN==timeRangeSAFRAN())){
@@ -358,36 +429,35 @@ server=function(input,output,session){
       }
     }
     
+    variable=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$name
     if(importation){
       if(length(timeRangeYears)==1){ # the time range asked by the user span over only one year
-        weather=read.table(paste0(path,"/data/meteo_safran/output/",timeRangeYears,"/",variable,"/Total.csv"),
-                           sep=";",header=TRUE,stringsAsFactors=FALSE)
+        show_modal_spinner(spin="orbit",text="Importation des données",color="#08298A")
+        
+        weather=readRDS(paste0(path,"/data/meteo_safran/output/",timeRangeYears,"/",variable,"/",timeRangeYears,"_",variable,".rds"))
       }else if(length(timeRangeYears)==2){ # time range asked by the user span over only two years
-        weather1=read.table(paste0(path,"/data/meteo_safran/output/",timeRangeYears[1],"/",variable,"/Total.csv"),
-                            sep=";",header=TRUE,stringsAsFactors=FALSE)
-        weather2=read.table(paste0(path,"/data/meteo_safran/output/",timeRangeYears[2],"/",variable,"/Total.csv"),
-                            sep=";",header=TRUE,stringsAsFactors=FALSE)
+        show_modal_spinner(spin="orbit",text="Importation des données",color="#08298A")
+        
+        weather1=readRDS(paste0(path,"/data/meteo_safran/output/",timeRangeYears[1],"/",variable,"/",timeRangeYears[1],"_",variable,".rds"))
+        weather2=readRDS(paste0(path,"/data/meteo_safran/output/",timeRangeYears[2],"/",variable,"/",timeRangeYears[2],"_",variable,".rds"))
+        
         weather=rbind(weather1,weather2)
         rm(list=c("weather1","weather2"))
         gc()
       }else{ # time range asked by the user span over more than two years
-        sendSweetAlert(session,
+        sendSweetAlert(session, # display an error message if not
                        title="Erreur",
-                       type="Error",
-                       text="L'application ne prévoit pas de moyenner des données 
-                       climatiques sur une plage temporelle suprérieure à deux années.")
-        weatherSAFRAN(NULL)
-        cartographySAFRAN(NULL)
-        legendSAFRAN(NULL)
-        tableSAFRAN(NULL)
-        timeRangeSAFRAN(NULL)
-        variableToPlotSAFRAN(NULL)
-        scaleToPlotSAFRAN(NULL)
+                       type="error",
+                       text=paste0("L'application ne prévoit pas de moyenner des données 
+                       climatiques sur une plage temporelle recouvrant plus de deux années."))
+        resetReactiveVal()
+        return(NULL)
       }
-      weather$Date=as.Date(weather$Date)
+      
       weather=weather[which(weather$Date%in%timeRangeDays),]
       weather=weather[,which(colnames(weather)%in%c("Site",variable))]
       weather=aggregate(.~Site,weather,"mean")
+      gc()
     }else{
       weather=weatherSAFRAN()
     }
@@ -395,80 +465,145 @@ server=function(input,output,session){
     remove_modal_spinner()
     show_modal_spinner(spin="orbit",text="Agrégation spatiale des données",color="#08298A")
     
-    grid=polygonsSaf
-    grid$variable=apply(grid,1,function(row){
-      if(as.numeric(row["altitud"])>=input$altitudeMeshSAFRAN[1] &
-         as.numeric(row["altitud"])<=input$altitudeMeshSAFRAN[2] &
-         as.numeric(row["clc_231"])>=input$meadowMeshSAFRAN[1] &
-         as.numeric(row["clc_231"])<=input$meadowMeshSAFRAN[2] &
-         as.numeric(row["clc_242"])>=input$fieldMeshSAFRAN[1] &
-         as.numeric(row["clc_242"])<=input$fieldMeshSAFRAN[2] &
-         as.numeric(row["clc_211"])>=input$fieldNoIrrigationMeshSAFRAN[1] &
-         as.numeric(row["clc_211"])<=input$fieldNoIrrigationMeshSAFRAN[2] &
-         as.numeric(row["clc_222"])>=input$orchardMeshSAFRAN[1] &
-         as.numeric(row["clc_222"])<=input$orchardMeshSAFRAN[2] &
-         as.numeric(row["clc_221"])>=input$vineyardMeshSAFRAN[1] &
-         as.numeric(row["clc_221"])<=input$vineyardMeshSAFRAN[2] &
-         as.numeric(row["clc_311"])>=input$hardwoodForestMeshSAFRAN[1] &
-         as.numeric(row["clc_311"])<=input$hardwoodForestMeshSAFRAN[2] &
-         as.numeric(row["clc_312"])>=input$coniferousForestMeshSAFRAN[1] &
-         as.numeric(row["clc_312"])<=input$coniferousForestMeshSAFRAN[2] &
-         as.numeric(row["clc_313"])>=input$mixedForestMeshSAFRAN[1] &
-         as.numeric(row["clc_313"])<=input$mixedForestMeshSAFRAN[2]){ # tile selection according to the characteristics asked by the user
-        return(weather[which(weather$Site==as.numeric(row["mll_sfr"])),variable])
-      }else{
-        return(NA)
+    aggregation=TRUE # test if the application actually needs to re-compute polygons values
+    if(!is.null(scaleToPlotSAFRAN()) &
+       !is.null(altitudeMeshSAFRAN()) &
+       # !is.null(meadowMeshSAFRAN()) &
+       # !is.null(fieldMeshSAFRAN()) &
+       # !is.null(fieldNoIrrigationMeshSAFRAN()) &
+       # !is.null(orchardMeshSAFRAN()) &
+       # !is.null(vineyardMeshSAFRAN()) &
+       # !is.null(hardwoodForestMeshSAFRAN()) &
+       # !is.null(coniferousForestMeshSAFRAN()) &
+       # !is.null(mixedForestMeshSAFRAN())
+       !is.null(forestMeshSAFRAN()) &
+       !is.null(meadowMeshSAFRAN()) &
+       !is.null(fieldMeshSAFRAN()) &
+       !is.null(orchardMeshSAFRAN()) &
+       !is.null(vineyardMeshSAFRAN())
+       ){
+      if(!importation &
+         input$scaleToPlotSAFRAN==scaleToPlotSAFRAN() &
+         all(input$altitudeMeshSAFRAN==altitudeMeshSAFRAN()) &
+         # all(input$meadowMeshSAFRAN==meadowMeshSAFRAN()) &
+         # all(input$fieldMeshSAFRAN==fieldMeshSAFRAN()) &
+         # all(input$fieldNoIrrigationMeshSAFRAN==fieldNoIrrigationMeshSAFRAN()) &
+         # all(input$orchardMeshSAFRAN==orchardMeshSAFRAN()) &
+         # all(input$vineyardMeshSAFRAN==vineyardMeshSAFRAN()) &
+         # all(input$hardwoodForestMeshSAFRAN==hardwoodForestMeshSAFRAN()) &
+         # all(input$coniferousForestMeshSAFRAN==coniferousForestMeshSAFRAN()) &
+         # all(input$mixedForestMeshSAFRAN==mixedForestMeshSAFRAN())
+         all(input$forestMeshSAFRAN==forestMeshSAFRAN()) &
+         all(input$meadowMeshSAFRAN==meadowMeshSAFRAN()) &
+         all(input$fieldMeshSAFRAN==fieldMeshSAFRAN()) &
+         all(input$orchardMeshSAFRAN==orchardMeshSAFRAN()) &
+         all(input$vineyardMeshSAFRAN==vineyardMeshSAFRAN()) 
+         ){
+        aggregation=FALSE
       }
-    })
-    grid=grid[,which(colnames(grid)%in%c("geometry","variable","mll_sfr"))]
+    }
     
-    if(input$scaleToPlotSAFRAN=="Mailles SAFRAN"){
-      polygons=grid
-      colnames(polygons)[which(colnames(polygons)=="mll_sfr")]="nom"
-      if(variable=="dli_q"){polygons$variable=round(polygons$variable)}else{polygons$variable=round(polygons$variable,1)}
-    }else{
-      if(input$scaleToPlotSAFRAN=="Départements"){
-        polygons=polygonsDep
-      }else if(input$scaleToPlotSAFRAN=="Régions"){
-        polygons=polygonsReg
-      }else if(input$scaleToPlotSAFRAN=="France entière"){
-        polygons=polygonsFra
+    if(aggregation){
+      grid=polygonsSaf
+      grid$variable=apply(grid,1,function(row){
+        if(as.numeric(row["altitud"])>=input$altitudeMeshSAFRAN[1] & # tile selection according to the characteristics asked by the user
+           as.numeric(row["altitud"])<=input$altitudeMeshSAFRAN[2] &
+           # as.numeric(row["clc_231"])>=input$meadowMeshSAFRAN[1] &
+           # as.numeric(row["clc_231"])<=input$meadowMeshSAFRAN[2] &
+           # as.numeric(row["clc_242"])>=input$fieldMeshSAFRAN[1] &
+           # as.numeric(row["clc_242"])<=input$fieldMeshSAFRAN[2] &
+           # as.numeric(row["clc_211"])>=input$fieldNoIrrigationMeshSAFRAN[1] &
+           # as.numeric(row["clc_211"])<=input$fieldNoIrrigationMeshSAFRAN[2] &
+           # as.numeric(row["clc_222"])>=input$orchardMeshSAFRAN[1] &
+           # as.numeric(row["clc_222"])<=input$orchardMeshSAFRAN[2] &
+           # as.numeric(row["clc_221"])>=input$vineyardMeshSAFRAN[1] &
+           # as.numeric(row["clc_221"])<=input$vineyardMeshSAFRAN[2] &
+           # as.numeric(row["clc_311"])>=input$hardwoodForestMeshSAFRAN[1] &
+           # as.numeric(row["clc_311"])<=input$hardwoodForestMeshSAFRAN[2] &
+           # as.numeric(row["clc_312"])>=input$coniferousForestMeshSAFRAN[1] &
+           # as.numeric(row["clc_312"])<=input$coniferousForestMeshSAFRAN[2] &
+           # as.numeric(row["clc_313"])>=input$mixedForestMeshSAFRAN[1] &
+           # as.numeric(row["clc_313"])<=input$mixedForestMeshSAFRAN[2]
+           as.numeric(row["Forêts"])>=input$forestMeshSAFRAN[1] &
+           as.numeric(row["Forêts"])<=input$forestMeshSAFRAN[2] &
+           as.numeric(row["Prairies"])>=input$meadowMeshSAFRAN[1] &
+           as.numeric(row["Prairies"])<=input$meadowMeshSAFRAN[2] &
+           as.numeric(row["Champs"])>=input$fieldMeshSAFRAN[1] &
+           as.numeric(row["Champs"])<=input$fieldMeshSAFRAN[2] &
+           as.numeric(row["Vergers"])>=input$orchardMeshSAFRAN[1] &
+           as.numeric(row["Vergers"])<=input$orchardMeshSAFRAN[2] &
+           as.numeric(row["Vignes"])>=input$vineyardMeshSAFRAN[1] &
+           as.numeric(row["Vignes"])<=input$vineyardMeshSAFRAN[2]
+           ){
+          return(weather[which(weather$Site==as.numeric(row["mll_sfr"])),variable])
+        }else{
+          return(NA)
+        }
+      })
+      grid=grid[,which(colnames(grid)%in%c("geometry","variable","mll_sfr"))]
+      
+      if(input$scaleToPlotSAFRAN=="Mailles SAFRAN"){
+        polygons=grid
+        colnames(polygons)[which(colnames(polygons)=="mll_sfr")]="nom"
+        if(variable=="dli_q"){polygons$variable=round(polygons$variable)}else{polygons$variable=round(polygons$variable,1)}
+      }else{
+        if(input$scaleToPlotSAFRAN=="Départements"){
+          polygons=polygonsDep
+        }else if(input$scaleToPlotSAFRAN=="Régions"){
+          polygons=polygonsReg
+        }else if(input$scaleToPlotSAFRAN=="France entière"){
+          polygons=polygonsFra
+        }
+        
+        polygons=polygons[,which(colnames(polygons)%in%c("geometry","nom"))]
+        
+        suppressWarnings({
+          intersections=st_intersection(grid,polygons)
+        })
+        intersections$area=as.numeric(st_area(intersections))
+
+        polygons$variable=apply(polygons,1,function(row){
+          intersects=intersections[which(intersections$nom==row["nom"] & !is.na(intersections$variable)),]
+          result=wtd.mean(intersects$variable,(intersects$area/sum(intersects$area)))
+          if(variable=="dli_q"){result=round(result)}else{result=round(result,1)}
+          return(result)
+        })
+        
+        polygons$variable_sd=apply(polygons,1,function(row){
+          intersects=intersections[which(intersections$nom==row["nom"] & !is.na(intersections$variable)),]
+          result=sqrt(wtd.var(intersects$variable,(intersects$area/sum(intersects$area)),normwt=TRUE))
+          result=round(result,2)
+          return(result)
+        })
       }
       
-      polygons=polygons[,which(colnames(polygons)%in%c("geometry","nom"))]
-      
-      suppressWarnings({
-        intersections=st_intersection(grid,polygons)
+      palette=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$palette
+      polygons$color=apply(polygons,1,function(row){
+        if(is.na(row["variable"])){
+          return("#898989")
+        }else if(as.numeric(row["variable"])<min(as.numeric(names(palette)))){
+          return(as.character(palette[1]))
+        }else if(as.numeric(row["variable"])>max(as.numeric(names(palette)))){
+          return(as.character(palette[length(palette)]))
+        }else{
+          return(as.character(palette[which(as.numeric(names(palette))==as.numeric(row["variable"]))]))
+        }
       })
-      intersections$area=as.numeric(st_area(intersections))
-      
-      polygons$variable=apply(polygons,1,function(row){
-        intersects=intersections[which(intersections$nom==row["nom"] & !is.na(intersections$variable)),]
-        result=sum(intersects$variable*intersects$area)/sum(intersects$area)
-        if(variable=="dli_q"){result=round(result)}else{result=round(result,1)}
-        return(result)
-      })
+    }else{
+      palette=paletteSAFRAN()
+      polygons=polygonsSAFRAN()
     }
     
     remove_modal_spinner()
     show_modal_spinner(spin="orbit",text="Création du graphique",color="#08298A")
-    
-    palette=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$palette
-    polygons$color=apply(polygons,1,function(row){
-      if(is.na(row["variable"])){
-        return("#898989")
-      }else{
-        return(palette[which(as.numeric(names(palette))==as.numeric(row["variable"]))])
-      }
-    })
-    
+
     p=ggplot()+
       geom_sf(fill=polygons$color,col=NA,data=polygons)+
       theme(legend.position="none",
             panel.grid=element_blank(),
             panel.background=element_rect(fill="white"),
             axis.line=element_line(colour="black"),
-            plot.title=element_text(size=16.5,hjust=0.5))+
+            plot.title=element_text(size=16,hjust=0.5))+
       ggtitle(paste0(" Variable : ",input$variableToPlotSAFRAN,
                      "\n Plage temporelle : ",input$timeRangeSAFRAN[1]," au ",input$timeRangeSAFRAN[2]," (moyenne)",
                      "\n Résolution spatiale : ",input$scaleToPlotSAFRAN))
@@ -493,17 +628,36 @@ server=function(input,output,session){
     
     breaks=SAFRANvarList[[which(names(SAFRANvarList)==input$variableToPlotSAFRAN)]]$breaks
     legend=makeLegend(palette,breaks,input$variableToPlotSAFRAN)
-    polygons=as.data.frame(polygons)
-    polygons=polygons[,which(colnames(polygons)%in%c("nom","variable"))]
-    colnames(polygons)[which(colnames(polygons)=="variable")]=variable
     
-    weatherSAFRAN(weather)
+    table=as.data.frame(polygons)
+    table=table[,which(colnames(table)%in%c("nom","variable","variable_sd"))]
+    colnames(table)[which(colnames(table)=="nom")]="Zone"
+    colnames(table)[which(colnames(table)=="variable")]=paste0("Mean.",variable)
+    colnames(table)[which(colnames(table)=="variable_sd")]=paste0("Sd.",variable)
+    
+    weatherSAFRAN(weather) # stores in reactive values all important objects
     cartographySAFRAN(p)
     legendSAFRAN(legend)
-    tableSAFRAN(polygons)
+    tableSAFRAN(table)
     timeRangeSAFRAN(input$timeRangeSAFRAN)
     variableToPlotSAFRAN(input$variableToPlotSAFRAN)
     scaleToPlotSAFRAN(input$scaleToPlotSAFRAN)
+    paletteSAFRAN(palette)
+    polygonsSAFRAN(polygons)
+    altitudeMeshSAFRAN(input$altitudeMeshSAFRAN)
+    # meadowMeshSAFRAN(input$meadowMeshSAFRAN)
+    # fieldMeshSAFRAN(input$fieldMeshSAFRAN)
+    # fieldNoIrrigationMeshSAFRAN(input$fieldNoIrrigationMeshSAFRAN)
+    # orchardMeshSAFRAN(input$orchardMeshSAFRAN)
+    # vineyardMeshSAFRAN(input$vineyardMeshSAFRAN)
+    # hardwoodForestMeshSAFRAN(input$hardwoodForestMeshSAFRAN)
+    # coniferousForestMeshSAFRAN(input$coniferousForestMeshSAFRAN)
+    # mixedForestMeshSAFRAN(input$mixedForestMeshSAFRAN)
+    forestMeshSAFRAN(input$forestMeshSAFRAN)
+    meadowMeshSAFRAN(input$meadowMeshSAFRAN)
+    fieldMeshSAFRAN(input$fieldMeshSAFRAN)
+    orchardMeshSAFRAN(input$orchardMeshSAFRAN)
+    vineyardMeshSAFRAN(input$vineyardMeshSAFRAN)
     
     remove_modal_spinner()
     return(NULL)
@@ -514,7 +668,6 @@ server=function(input,output,session){
       isolate({
         if(!is.null(legendSAFRAN())){
           return(grid.arrange(cartographySAFRAN(),legendSAFRAN(),ncol=1,heights=c(8,2)))
-          print("renderplot")
         }else{
           return(NULL)
         }
@@ -524,7 +677,21 @@ server=function(input,output,session){
     }
   })
   
-  observeEvent(input$saveCarto,{
+  output$buttonSaveCartoSAFRAN=renderUI({
+    if(!is.null(cartographySAFRAN())){
+      isolate({
+        if(!is.null(legendSAFRAN())){
+          return(actionBttn("saveCartoSAFRAN",label=NULL,style="simple",color="success",icon=icon("save")))
+        }else{
+          return(NULL)
+        }
+      })
+    }else{
+      return(NULL)
+    }
+  })
+  
+  observeEvent(input$saveCartoSAFRAN,{
     if(!is.null(cartographySAFRAN()) & !is.null(legendSAFRAN())){
       savePath=choose.dir()
 
@@ -532,12 +699,20 @@ server=function(input,output,session){
         return(NULL)
       }else{
         variable=substr(variableToPlotSAFRAN(),1,(as.numeric(gregexpr("\\[",variableToPlotSAFRAN()))-2))
-        pdf(paste0(savePath,"/",variable,"_",
-                   timeRangeSAFRAN()[1],"_",timeRangeSAFRAN()[2],"_",
-                   scaleToPlotSAFRAN(),".pdf"))
-        p=grid.arrange(cartographySAFRAN(),legendSAFRAN(),ncol=1,heights=c(8,2))
-        print(p)
-        dev.off()
+        filename=paste0(savePath,"/",variable,"_",timeRangeSAFRAN()[1],"_",timeRangeSAFRAN()[2],"_",scaleToPlotSAFRAN(),".pdf")
+        
+        if(file.exists(filename)){
+          sendSweetAlert(session,
+                         title="Erreur",
+                         type="error",
+                         text=paste0("L'enregistrement à échoué car le fichier ",gsub("\\\\","/",filename)," existe déjà."))
+          return(NULL)
+        }else{
+          pdf(filename)
+          p=grid.arrange(cartographySAFRAN(),legendSAFRAN(),ncol=1,heights=c(8,2))
+          print(p)
+          dev.off()
+        }
       }
     }
   })
@@ -548,10 +723,17 @@ server=function(input,output,session){
     }else{
       return(NULL)
     }
-  },options=list(lengthMenu=list(c(10,100,1000,-1),c("10","100","1000","All")),
-                 pageLength=10,dom="ftp"))
+  },options=list(pageLength=10,dom="ftp",columnDefs=list(list(className='dt-center',width='60px',targets="_all"))),rownames=FALSE)
+  
+  output$buttonSaveTableSAFRAN=renderUI({
+    if(!is.null(tableSAFRAN())){
+      return(actionBttn("saveTableSAFRAN",label=NULL,style="simple",color="success",icon=icon("save")))
+    }else{
+      return(NULL)
+    }
+  })
 
-  observeEvent(input$saveTable,{
+  observeEvent(input$saveTableSAFRAN,{
     if(!is.null(tableSAFRAN())){
       savePath=choose.dir()
       
@@ -559,9 +741,16 @@ server=function(input,output,session){
         return(NULL)
       }else{
         variable=substr(variableToPlotSAFRAN(),1,(as.numeric(gregexpr("\\[",variableToPlotSAFRAN()))-2))
-        write.table(tableSAFRAN(),paste0(savePath,"/",variable,"_",
-                   timeRangeSAFRAN()[1],"_",timeRangeSAFRAN()[2],"_",
-                   scaleToPlotSAFRAN(),".csv"),sep=";",row.names=FALSE)
+        filename=paste0(savePath,"/",variable,"_",timeRangeSAFRAN()[1],"_",timeRangeSAFRAN()[2],"_",scaleToPlotSAFRAN(),".csv")
+        if(file.exists(filename)){
+          sendSweetAlert(session,
+                         title="Erreur",
+                         type="error",
+                         text=paste0("L'enregistrement à échoué car le fichier ",gsub("\\\\","/",filename)," existe déjà."))
+          return(NULL)
+        }else{
+          write.table(tableSAFRAN(),filename,sep=";",row.names=FALSE)
+        }
       }
     }
   })

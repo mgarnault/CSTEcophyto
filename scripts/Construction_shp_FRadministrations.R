@@ -12,7 +12,7 @@ rm(list=ls(all.names=TRUE))
 gc()
 
 # Clear R-session and R-system memory
-.rs.restartR() # this command must be run independently otherwise Rstudio IDE may freeze
+# .rs.restartR() # this command must be run independently otherwise Rstudio IDE may freeze
 
 # Clear console
 cat("\014")
@@ -23,8 +23,6 @@ cat("\014")
 library("ggplot2")
 
 # install.packages("rmapshaper")
-# library("devtools") # need Rtools first: download from https://cran.r-project.org/bin/windows/Rtools/
-# install_github("ateucher/rmapshaper") # avoid encoding error from ms_simplify(), see: https://github.com/ateucher/rmapshaper/issues/67
 library("rmapshaper") # ms_simplify(..., sys=TRUE) needs the mapshaper node: download from https://nodejs.org/en/ and execute "npm install -g mapshaper" in a command prompt
 
 # install.packages("sf")
@@ -41,7 +39,9 @@ library("parallel")
 
 
 # Working directory
-path="C:/Users/mgarnault/Documents/CSTEcophyto"
+path=dirname(rstudioapi::getSourceEditorContext()$path)
+path=substr(path,1,(as.numeric(gregexpr("/scripts",dirname(rstudioapi::getSourceEditorContext()$path)))-1))
+setwd(path)
 
 
 # Global parameters

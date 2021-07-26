@@ -12,7 +12,7 @@ rm(list=ls(all.names=TRUE))
 gc()
 
 # Clear R-session and R-system memory
-.rs.restartR() # this command must be run independently otherwise Rstudio IDE may freeze
+# .rs.restartR() # this command must be run independently otherwise Rstudio IDE may freeze
 
 # Clear console
 cat("\014")
@@ -33,13 +33,14 @@ library("parallel")
 
 
 # Working directory
-path="C:/Users/mgarnault/Documents/CSTEcophyto"
+path=dirname(rstudioapi::getSourceEditorContext()$path)
+path=substr(path,1,(as.numeric(gregexpr("/scripts",dirname(rstudioapi::getSourceEditorContext()$path)))-1))
+setwd(path)
 
 
 # Grid estimation method
 handmade=TRUE
-name="" # store the chosen characteristics for future data saving  
-if(handmade){name=paste0(name,"_handmade")}else{name=paste0(name,"_points2grid")}
+if(handmade){name=paste0(name,"_handmade")}else{name=paste0(name,"_points2grid")} # store the chosen characteristics for future data saving  
 
 
 
