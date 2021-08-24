@@ -1,4 +1,4 @@
-# HEADER #
+# HEADER # 
 # Clear command history
 write("",file=".blank")
 loadhistory(".blank")
@@ -40,7 +40,7 @@ setwd(path)
 
 # Grid estimation method
 handmade=TRUE
-if(handmade){name=paste0(name,"_handmade")}else{name=paste0(name,"_points2grid")} # store the chosen characteristics for future data saving  
+if(handmade){name="_handmade"}else{name="_points2grid"} # store the chosen characteristics for future data saving  
 
 
 
@@ -192,4 +192,10 @@ if(!file.exists(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name))){
   unlink(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name),recursive=TRUE)
   dir.create(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name))
 }
-st_write(grid,paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/SAFRANgrid",name,".shp"),layer_options="ENCODING=UTF-8")
+
+dir.create(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/shp"))
+st_write(grid,paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/shp/SAFRANgrid",name,".shp"),layer_options="ENCODING=UTF-8")
+
+colnames(grid)=colnames(st_read(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/shp"),options="ENCODING=UTF-8",quiet=TRUE))
+dir.create(paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/rds"))
+saveRDS(grid,paste0(path,"/data/mailles_safran/output/SAFRANgrid",name,"/rds/SAFRANgrid",name,".rds"))

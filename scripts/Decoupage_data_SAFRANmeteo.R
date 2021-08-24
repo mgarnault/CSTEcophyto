@@ -1,4 +1,4 @@
-# HEADER #
+# HEADER # 
 # Clear command history
 write("",file=".blank")
 loadhistory(".blank")
@@ -22,12 +22,13 @@ cat("\014")
 # install.packages("parallel")
 library("parallel")
 
-# install.packages("readr")
-library("readr")
+# install.packages("data.table")
+library("data.table")
 
 # Working directory
 path=dirname(rstudioapi::getSourceEditorContext()$path)
 path=substr(path,1,(as.numeric(gregexpr("/scripts",dirname(rstudioapi::getSourceEditorContext()$path)))-1))
+# path="/home/mgarnault/CSTEcophyto"
 setwd(path)
 
 
@@ -37,10 +38,8 @@ setwd(path)
 
 # DATA LOAD, SPLIT AND SAVE #
 # Loading data
-weather=read.table(paste0(path,"/data/meteo_safran/raw/guillaumeHarel/siclima_extraction_401_20210413.csv"),
-                   sep=";",header=TRUE,stringsAsFactors=FALSE)
-weather=read.table(paste0(path,"/data/meteo_safran/raw/guillaumeHarel/siclima_extraction_401_20210413.csv"),
-                   sep=";",header=TRUE,stringsAsFactors=FALSE)
+weather=fread(paste0(path,"/data/meteo_safran/raw/projet_d_extraction_538_20210713/siclima_extraction_538_20210713.csv"),
+                   sep=";",data.table=FALSE)
 gc()
 
 # Saving years and climatic variable values
@@ -59,6 +58,7 @@ sapply(years,function(year){
   d=weather[which(weather$Year==year),]
   d=d[,which(!colnames(d)%in%c("Year","Month","DOM","DOY"))]
   saveRDS(d,paste0(path,"/parallel/tempData/",year,".rds"))
+  gc()
 })
 rm(list="weather") # remove the big weather dataset from RAM
 gc()
@@ -92,10 +92,10 @@ parSapply(cl,years,function(year){
 
     df2=df[,which(colnames(df)%in%c("Site","Date",climVar))]
     
-    write.table(df2, # save the raw dataset containing 1 year and 1 climatic variable (csv)
-                paste0(path,"/data/meteo_safran/output/",year,"/",climVar,"/",year,"_",climVar,".csv"),
-                sep=";",row.names=FALSE)
-    cat("File .csv saved\n")
+    # write.table(df2, # save the raw dataset containing 1 year and 1 climatic variable (csv)
+    #             paste0(path,"/data/meteo_safran/output/",year,"/",climVar,"/",year,"_",climVar,".csv"),
+    #             sep=";",row.names=FALSE)
+    # cat("File .csv saved\n")
     
     saveRDS(df2, # save the raw dataset containing 1 year and 1 climatic variable (rds)
             paste0(path,"/data/meteo_safran/output/",year,"/",climVar,"/",year,"_",climVar,".rds"))
@@ -107,5 +107,5 @@ stopCluster(cl)
 gc()
 
 # Emptying parallelization folders
-# unlink(paste0(path,"/parallel/consoleOutputs/*"),recursive=TRUE)
-# unlink(paste0(path,"/parallel/tempData/*"),recursive=TRUE)
+unlink(paste0(path,"/parallel/consoleOutputs/*"),recursive=TRUE)
+unlink(paste0(path,"/parallel/tempData/*"),recursive=TRUE)
